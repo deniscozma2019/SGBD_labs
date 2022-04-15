@@ -1,0 +1,86 @@
+create table Persoane
+(
+   idPersoana INT NOT NUL,
+   Nume VARCHAR(100)NOT NUL,
+   Virsta INT NOT NUL,
+   PRIMARY KEY (idPersoane)
+)
+ insert into Persoane
+ (idPersoana,Nume,Virsta)
+VALUES
+(1,'Sergiu',32),
+(2,'Valera',19),
+(3,'Elvia',21);
+
+create table Amici
+(
+idPersoana1 INT NOT NUL,idPersoana2 INT NOT NUL)
+insert into Amici
+(idPersoana1,idPersoana2)
+VALUES
+(1,3);
+create table Rude
+(
+   idPersoana1 INT NOT NUL,idPersoana2 INT NOT NUL
+)
+ insert into Rude
+ (idPersoana1,idPersoana2)
+VALUES
+(2,3)
+
+Alter table Persoane
+ADD CONSTRAINT PRIMARY KEY (idPersoana,idAmici);
+1)
+CREATE
+   VIEW Ved1(nume1,nume2) AS select p1.numePersoane, p2.numePersoana FROM Amici,
+INNER JOIN persoane p1 ON p1.idPersoana = amici.idPersoan1 INNER JOIN persoane p2 on p2.idPersoana = amici.idPersoana2
+2)
+create view Ved2 (nume,amount) as select nume1,count(*) from Ved1 group
+by(nume1) having count >1;
+3)
+In Ved1 putem schimba perechi de prieteni,iar in Ved2 putem schimba numarul de prieteni la o persoana.
+Si se poate de sters datele care acolo exista sau de adaugat noi date.
+4)
+CREATE OR REPLACE TRIGGER trig1
+AFTER INSERT ON persoane 
+FOR EACH ROW
+BEGIN
+   INSERT INTO amici(NEW.idPersoana,idPersoana)
+   SELECT idPersoana FROM Persoane WHERE numePersoana = 'Elvia';
+    INSERT INTO rude(NEW.idPersoana,idPersoana)
+   SELECT idPersoana FROM Persoane WHERE numePersoana = 'Elvia';
+END;$$
+
+5)
+/*delimiter $$
+CREATE OR REPLACE TRIGGER trig2
+BEFORE INSERT ON rude
+FOR EACH ROW
+BEGIN
+if(SELECT idPersoana1 FROM rude WHERE idpersoana1 = NEW.idpersoana1 AND idpersoana2 = NEW.idpersoana2 OR idpersoana1 = NEW.idpersoana2 AND idpersoana2 = NEW.idpersoana1) then
+SIGNAL SQLSTATE '45000'
+    SET MESSAGE_TEXT = 'persoana nu poate fi eliminata';
+    ELSE INSERT INTO amici VALUES (NEW.idpersoana1,NEW.idpersoana2);
+  END if;
+  END; $$
+delimiter ;*/
+6)
+CREATE PROCEDURE myProcedure1(IN nume, OUT sir)
+BEGIN
+
+SELECT CONCAT(idPersoana,'', UPPER(numePersoana)),'',Virsta)INTO sir FROM
+PERSOANE WHERE numePersoana = nume;
+END
+7)
+CREATE FUNCTION myFunccion(nume varchar)
+RETURNS int
+BEGIN
+RETURNS amount = SELECT COUNT(*) FROM amici GROUP BY nume;
+END
+
+
+
+
+
+
+
